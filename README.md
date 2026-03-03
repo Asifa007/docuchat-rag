@@ -1,13 +1,7 @@
-# 🧠 DocuChat — Offline AI Document Intelligence Platform
+# DocuChat — Offline Document Intelligence Platform
 
-> **Chat with any PDF. 100% offline. Zero cost. Zero hallucinations.**  
-> Powered by Ollama · LLaMA 3 · nomic-embed-text · FAISS · FastAPI · React
-
-![DocuChat Banner](https://img.shields.io/badge/AI-Offline%20RAG-6c63ff?style=for-the-badge&logo=brain&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.11+-00d4aa?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react&logoColor=black)
-![FAISS](https://img.shields.io/badge/FAISS-Vector%20DB-ff6b6b?style=for-the-badge)
+> A privacy-focused AI system that enables semantic search and question answering over PDF documents using a locally deployed RAG architecture.
+> Built with FastAPI · FAISS · Local LLM · React · Tailwind CSS
 
 ---
 
@@ -15,19 +9,19 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        DocuChat Platform                         │
-│                                                                  │
+│                        DocuChat Platform                        │
+│                                                                 │
 │  ┌────────────┐    ┌──────────────┐    ┌────────────────────┐  │
-│  │  React +   │    │   FastAPI    │    │      Ollama        │  │
-│  │  Vite UI   │───▶│   Backend    │───▶│  ┌─────────────┐  │  │
-│  │            │    │              │    │  │   llama3    │  │  │
-│  │  - Upload  │    │  - /upload   │    │  │  (LLM Chat) │  │  │
-│  │  - Chat    │    │  - /query    │    │  └─────────────┘  │  │
-│  │  - Status  │    │  - /status   │    │  ┌─────────────┐  │  │
-│  └────────────┘    │  - /clear    │    │  │nomic-embed  │  │  │
-│                    └──────┬───────┘    │  │  (Vectors)  │  │  │
-│                           │           │  └─────────────┘  │  │
-│                    ┌──────▼───────┐   └────────────────────┘  │
+│  │  React +   │    │   FastAPI    │    │   Local AI Engine  │  │
+│  │  Vite UI   │───▶│   Backend    │───▶│                   │  │
+│  │            │    │              │    │  ┌─────────────┐   │  │
+│  │  - Upload  │    │  - /upload   │    │  │   LLM Chat  │   │  │
+│  │  - Chat    │    │  - /query    │    │  └─────────────┘   │  │
+│  │  - Status  │    │  - /status   │    │  ┌─────────────┐   │  │
+│  └────────────┘    │  - /clear    │    │  │ Embeddings  │   │  │
+│                    └──────┬───────┘    │  └─────────────┘   │  │
+│                           │            └────────────────────┘  │
+│                    ┌──────▼───────┐                             │
 │                    │    FAISS     │                             │
 │                    │ Vector Store │                             │
 │                    │ (In-Memory)  │                             │
@@ -47,10 +41,10 @@ Text Extraction (pypdf)
 Smart Chunking (600 chars, 100 overlap)
     │
     ▼
-Embedding Generation (nomic-embed-text via Ollama)
+Embedding Generation (Local embedding model)
     │
     ▼
-FAISS Index (L2-normalized cosine similarity)
+FAISS Index (Cosine similarity search)
     │
    [Ready for queries]
     │
@@ -66,10 +60,10 @@ FAISS Top-K Search (k=5)
 Context Assembly
     │
     ▼
-Strict Prompt → LLaMA 3
+Strict Prompt → Local LLM
     │
     ▼
-Answer (strictly from document)
+Answer (strictly from document context)
 ```
 
 ---
@@ -117,49 +111,19 @@ docuchat/
 
 - **Python 3.11+**
 - **Node.js 18+** and npm
-- **[Ollama](https://ollama.com)** installed
 
 ---
 
 ## ⚙️ Setup Instructions
-
-### Step 1 — Install Ollama
-
-```bash
-# macOS / Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Windows: Download installer from https://ollama.com/download
+Step 1 — Clone the Repository
 ```
-
-### Step 2 — Pull Required Models
-
-```bash
-# Pull LLaMA 3 (chat model) — ~4.7GB
-ollama pull llama3
-
-# Pull nomic-embed-text (embedding model) — ~274MB
-ollama pull nomic-embed-text
-
-# Verify both are available
-ollama list
+git clone https://github.com/your-username/docuchat.git
+cd docuchat
 ```
+Step 2 — Set Up Backend
 
-### Step 3 — Start Ollama Server
-
-```bash
-ollama serve
-# Runs on http://localhost:11434
 ```
-
-> 💡 On macOS, Ollama runs as a background service automatically after installation.
-
----
-
-### Step 4 — Set Up Backend
-
-```bash
-cd docuchat/backend
+cd backend
 
 # Create virtual environment
 python -m venv venv
@@ -172,55 +136,51 @@ source venv/bin/activate       # Linux/macOS
 # Install dependencies
 pip install -r requirements.txt
 ```
-
-### Step 5 — Run Backend
-
-```bash
-# From docuchat/backend/
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+Step 3 — Run Backend
 ```
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-Backend API docs: `http://localhost:8000/docs`
+Backend API docs available at:
 
----
-
-### Step 6 — Set Up Frontend
-
-```bash
-cd docuchat/frontend
+http://localhost:8000/docs
+```
+Step 4 — Set Up Frontend
+```
+cd ../frontend
 
 # Install dependencies
 npm install
 ```
-
-### Step 7 — Run Frontend
-
-```bash
-npm run dev
-# Runs on http://localhost:5173
+Step 5 — Run Frontend
 ```
-
----
-
+npm run dev
+```
+Frontend runs on:
+```
+http://localhost:5173
+```
 ## 🌐 Open the App
 
-Visit: **http://localhost:5173**
+Visit:
+```
+http://localhost:5173
+```
+Ensure backend is running on port 8000
 
-1. Watch for the **"Ollama Connected"** status indicator
-2. Click **"Start Chatting"** on the landing page
-3. **Drag-and-drop** (or click to browse) your PDF
-4. Wait for indexing (~5–30 seconds depending on document size)
-5. **Ask questions** — answers come only from your document!
+Click "Start Chatting"
 
----
+Upload a PDF (drag-and-drop supported)
+
+Wait for document indexing
+
+Ask questions — responses are generated strictly from retrieved document context
 
 ## 🧪 Testing the API
-
-```bash
+```
 # Health check
 curl http://localhost:8000/
 
-# Check status
+# Check system status
 curl http://localhost:8000/status
 
 # Upload a PDF
@@ -232,77 +192,50 @@ curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
   -d '{"question": "What is this document about?"}'
 
-# Clear
+# Clear session
 curl -X DELETE http://localhost:8000/clear
 ```
-
----
-
 ## 🌍 Expose with ngrok (Optional)
-
-Share your local instance publicly:
-
-```bash
-# Install ngrok: https://ngrok.com/download
-# Then:
+```
 ngrok http 5173
-
-# For backend separately:
 ngrok http 8000
 ```
-
-Update `VITE_API_URL` in frontend or the Vite proxy config with your ngrok URL.
-
----
+Update VITE_API_URL in the frontend if exposing backend publicly.
 
 ## 🔧 Configuration
 
-### Switch LLM Model (Backend)
+Change Retrieval Parameters
 
-Edit `backend/app/rag.py`:
-
-```python
-LLM_MODEL = "mistral"    # or "llama3", "llama3.1", "gemma2"
+Edit backend/app/rag.py:
 ```
-
-Available models: `ollama list`
-
-### Adjust Chunk Size
-
-```python
-CHUNK_SIZE = 600    # Characters per chunk
-CHUNK_OVERLAP = 100 # Overlap between chunks
-TOP_K_CHUNKS = 5    # Chunks retrieved per query
+CHUNK_SIZE = 600
+CHUNK_OVERLAP = 100
+TOP_K_CHUNKS = 5
+Change LLM Model (If Using Local Model)
+LLM_MODEL = "your-local-model-name"
+Change Embedding Model
+EMBED_MODEL = "your-embedding-model-name"
 ```
-
-### Change Embedding Model
-
-```python
-EMBED_MODEL = "nomic-embed-text"  # in embeddings.py
-```
-
----
-
 ## 🎯 Features
 
 | Feature | Status |
-|--------|--------|
+|----------|----------|
 | PDF text extraction | ✅ |
 | Overlapping chunk strategy | ✅ |
-| Ollama nomic-embed-text embeddings | ✅ |
+| Local embedding generation | ✅ |
 | FAISS cosine similarity search | ✅ |
-| Anti-hallucination system prompt | ✅ |
-| Fallback message for missing context | ✅ |
+| Grounded (anti-hallucination) prompt system | ✅ |
+| Fallback response for insufficient context | ✅ |
 | Drag-and-drop upload | ✅ |
 | Upload progress bar | ✅ |
-| Real-time Ollama status indicator | ✅ |
+| Real-time backend status indicator | ✅ |
 | Typing indicator animation | ✅ |
 | Source citations per answer | ✅ |
 | Character counter for input | ✅ |
 | Mobile-responsive design | ✅ |
-| Dark glassmorphism UI | ✅ |
+| Modern glassmorphism UI | ✅ |
 | Animated landing page | ✅ |
-| Architecture diagram | ✅ |
+| System architecture diagram | ✅ |
 | Clear & reset session | ✅ |
 | Auto-scroll chat | ✅ |
 
@@ -320,11 +253,11 @@ EMBED_MODEL = "nomic-embed-text"  # in embeddings.py
 
 ## 📊 Performance Tips
 
-- Use **llama3** for best accuracy; **mistral** for speed
-- Smaller PDFs (< 50 pages) process in under 30 seconds
-- For large documents (100+ pages): expect 2–5 minutes for embedding
-- Runs well on M1/M2 Mac, modern CPU, or NVIDIA GPU
-- GPU acceleration: Ollama auto-detects CUDA/Metal
+- Smaller PDFs (< 50 pages) typically index in under 30 seconds (CPU-based inference)
+- Larger documents (100+ pages) may take 2–5 minutes for embedding generation
+- First query may be slower due to model initialization
+- Subsequent queries are significantly faster due to cached index
+- GPU acceleration (if supported by your local model) improves embedding and inference speed
 
 ---
 
@@ -332,9 +265,9 @@ EMBED_MODEL = "nomic-embed-text"  # in embeddings.py
 
 | Layer | Technology |
 |-------|-----------|
-| LLM | Ollama + LLaMA 3 |
-| Embeddings | Ollama + nomic-embed-text |
-| Vector DB | FAISS (Facebook AI) |
+| LLM | Local LLM inference |
+| Embeddings | Local embedding model |
+| Vector DB | FAISS |
 | Backend | FastAPI + Python |
 | PDF Parsing | pypdf |
 | Frontend | React 18 + Vite |
@@ -347,30 +280,21 @@ EMBED_MODEL = "nomic-embed-text"  # in embeddings.py
 
 ## 🐛 Troubleshooting
 
-**"Ollama not connected"**
-```bash
-ollama serve  # Start the server
-ollama list   # Verify models are pulled
+Backend not running
 ```
-
-**"Model not found" error**
-```bash
-ollama pull llama3
-ollama pull nomic-embed-text
+uvicorn app.main:app --reload --port 8000
 ```
-
-**Slow embedding generation**
-- Normal for first run (model loading)
-- Subsequent queries are faster
-- GPU significantly speeds this up
-
-**PDF has no extractable text**
-- PDF may be a scanned image
-- Use OCR tool first (e.g., Adobe Acrobat, tesseract)
-
-**CORS errors in browser**
-- Ensure backend is running on port 8000
-- Vite proxy is configured in `vite.config.js`
+Ensure the backend is accessible at:
+```
+http://localhost:8000
+```
+- PDF has no extractable text
+- The document may be scanned (image-based)
+- Use an OCR tool before uploading
+- Slow indexing
+- Large PDFs generate more chunks and embeddings
+- CPU-based systems may take longer
+- Reduce CHUNK_SIZE if needed
 
 ---
 
@@ -380,14 +304,9 @@ MIT License — free to use, modify, and distribute.
 
 ---
 
-## 🙌 Built With
+## 👩‍💻 Author
 
-- [Ollama](https://ollama.com) — local LLM runtime
-- [FAISS](https://github.com/facebookresearch/faiss) — vector similarity search
-- [FastAPI](https://fastapi.tiangolo.com) — modern Python API framework
-- [React](https://react.dev) — frontend library
-- [Tailwind CSS](https://tailwindcss.com) — utility-first styling
+Built by **Asifa Firdhouse**
 
 ---
 
-*Made with ❤️ for the AI/ML community. 100% local, 100% free, 100% yours.*
