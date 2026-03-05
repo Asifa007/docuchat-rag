@@ -5,7 +5,7 @@ pypdf
 chromadb
 numpy
 requests
-pydantic
+pydantic==1.10.15
 python-dotenv
 sentence-transformers
 torch
