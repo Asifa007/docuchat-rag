@@ -1,59 +1,63 @@
-// src/App.jsx
-// DocuChat — Offline AI Document Intelligence Platform
-// Main application component
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { uploadDocument, queryDocument, clearDocument } from './utils/api';
-import { useStatus } from './hooks/useStatus';
-import LandingPage from './components/LandingPage';
-import Sidebar from './components/Sidebar';
-import ChatArea from './components/ChatArea';
-import UploadPanel from './components/UploadPanel';
+// src/App.jsx
+import { useState, useCallback } from "react";
+import { uploadDocument, queryDocument, clearDocument } from "./utils/api";
+import { useStatus } from "./hooks/useStatus";
+import LandingPage from "./components/LandingPage";
+import Sidebar from "./components/Sidebar";
+import ChatArea from "./components/ChatArea";
+import UploadPanel from "./components/UploadPanel";
 
 export default function App() {
   const { status, refetch } = useStatus(6000);
 
-  // App state
-  const [phase, setPhase] = useState('landing'); // landing | upload | chat
-  const [documentName, setDocumentName] = useState('');
+  const [phase, setPhase] = useState("landing");
+  const [documentName, setDocumentName] = useState("");
   const [chunkCount, setChunkCount] = useState(0);
   const [messages, setMessages] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Upload state
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | processing | done | error
-  const [uploadError, setUploadError] = useState('');
+  const [uploadStatus, setUploadStatus] = useState("idle");
+  const [uploadError, setUploadError] = useState("");
 
-  const handleStartUpload = () => setPhase('upload');
+  const handleStartUpload = () => setPhase("upload");
 
   const handleFileUpload = useCallback(async (file) => {
-    setUploadStatus('uploading');
+    setUploadStatus("uploading");
     setUploadProgress(0);
-    setUploadError('');
+    setUploadError("");
 
     try {
       const result = await uploadDocument(file, (pct) => {
         setUploadProgress(pct);
-        if (pct === 100) setUploadStatus('processing');
+        if (pct === 100) setUploadStatus("processing");
       });
 
-      setDocumentName(result.document_name);
-      setChunkCount(result.chunks);
-      setUploadStatus('done');
-      setMessages([{
-        id: Date.now(),
-        role: 'ai',
-        text: `📄 I've read **${result.document_name}** and indexed **${result.chunks} chunks** into my memory. Ask me anything about this document!`,
-        timestamp: new Date(),
-      }]);
+      const docName = result.document_name || result.filename || "Document";
+      const chunks = result.chunks || result.chunk_count || 0;
+
+      setDocumentName(docName);
+      setChunkCount(chunks);
+      setUploadStatus("done");
+
+      setMessages([
+        {
+          id: Date.now(),
+          role: "ai",
+          text: `📄 I've read ${docName} and indexed ${chunks} chunks into memory.`,
+          timestamp: new Date(),
+        },
+      ]);
 
       await refetch();
-      setTimeout(() => setPhase('chat'), 1200);
-
+      setTimeout(() => setPhase("chat"), 1200);
     } catch (err) {
-      setUploadStatus('error');
-      setUploadError(err.response?.data?.detail || 'Upload failed. Check that Ollama is running.');
+      setUploadStatus("error");
+      setUploadError(
+        err.response?.data?.detail ||
+        "Upload failed. Please check the backend service."
+      );
     }
   }, [refetch]);
 
@@ -62,7 +66,7 @@ export default function App() {
 
     const userMsg = {
       id: Date.now(),
-      role: 'user',
+      role: "user",
       text: question,
       timestamp: new Date(),
     };
@@ -72,22 +76,25 @@ export default function App() {
 
     try {
       const result = await queryDocument(question);
+
       const aiMsg = {
         id: Date.now() + 1,
-        role: 'ai',
-        text: result.answer,
-        sources: result.sources,
+        role: "ai",
+        text: result.answer || "No answer returned.",
+        sources: result.sources || [],
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
       const errMsg = {
         id: Date.now() + 1,
-        role: 'ai',
-        text: '⚠️ ' + (err.response?.data?.detail || 'Something went wrong. Please try again.'),
+        role: "ai",
+        text: "⚠️ " + (err.response?.data?.detail || "Something went wrong. Please try again."),
         isError: true,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsGenerating(false);
@@ -98,42 +105,23 @@ export default function App() {
     try {
       await clearDocument();
       setMessages([]);
-      setDocumentName('');
+      setDocumentName("");
       setChunkCount(0);
-      setPhase('upload');
-      setUploadStatus('idle');
+      setPhase("upload");
+      setUploadStatus("idle");
       setUploadProgress(0);
       await refetch();
     } catch (err) {
-      console.error('Clear failed:', err);
+      console.error("Clear failed:", err);
     }
   }, [refetch]);
 
-  // ─────────────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────────────
-
-  if (phase === 'landing') {
-    return (
-      <LandingPage
-        status={status}
-        onGetStarted={handleStartUpload}
-      />
-    );
+  if (phase === "landing") {
+    return <LandingPage status={status} onGetStarted={handleStartUpload} />;
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden" style={{ background: 'var(--void)' }}>
-      {/* Background layers */}
-      <div className="fixed inset-0 dot-grid opacity-40 pointer-events-none" />
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-5"
-          style={{ background: 'radial-gradient(circle, #6c63ff, transparent 70%)' }} />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-5"
-          style={{ background: 'radial-gradient(circle, #00d4aa, transparent 70%)' }} />
-      </div>
-
-      {/* Sidebar */}
+    <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar
         status={status}
         documentName={documentName}
@@ -141,12 +129,11 @@ export default function App() {
         messageCount={messages.length}
         phase={phase}
         onClear={handleClearChat}
-        onNewUpload={() => { handleClearChat(); }}
+        onNewUpload={() => handleClearChat()}
       />
 
-      {/* Main area */}
-      <main className="flex-1 flex flex-col relative overflow-hidden">
-        {phase === 'upload' ? (
+      <main className="flex-1 flex flex-col">
+        {phase === "upload" ? (
           <UploadPanel
             status={status}
             uploadStatus={uploadStatus}
@@ -166,3 +153,4 @@ export default function App() {
     </div>
   );
 }
+
