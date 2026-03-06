@@ -3,6 +3,7 @@
 > A privacy-focused AI system that enables semantic search and question answering over PDF documents using a locally deployed RAG architecture.
 > Built with FastAPI · FAISS · Local LLM · React · Tailwind CSS
 
+⭐ If you find this project useful, consider giving it a star on GitHub!
 ---
 
 ## 🏗️ Architecture
@@ -41,7 +42,7 @@ Text Extraction (pypdf)
 Smart Chunking (600 chars, 100 overlap)
     │
     ▼
-Embedding Generation (Local embedding model)
+Embedding Generation (SentenceTransformers MiniLM)
     │
     ▼
 FAISS Index (Cosine similarity search)
@@ -117,9 +118,10 @@ docuchat/
 ## ⚙️ Setup Instructions
 Step 1 — Clone the Repository
 ```
-git clone https://github.com/your-username/docuchat.git
-cd docuchat
+git clone https://github.com/Asifa007/docuchat-rag.git
+cd docuchat-rag
 ```
+
 Step 2 — Set Up Backend
 
 ```
@@ -260,10 +262,18 @@ EMBED_MODEL = "your-embedding-model-name"
 - GPU acceleration (if supported by your local model) improves embedding and inference speed
 
 ---
+## 🌐 Live Demo
+
+Frontend  
+https://docuchat-frontend-h83f.onrender.com
+
+Backend API  
+https://docuchat-backend-qsf2.onrender.com
+
 
 ## 🧱 Tech Stack
 
-| Layer | Technology |
+| LLM / Embeddings | SentenceTransformers MiniLM |
 |-------|-----------|
 | LLM | Local LLM inference |
 | Embeddings | Local embedding model |
